@@ -8,6 +8,7 @@ import (
 
 	_ "github.com/denisenkom/go-mssqldb"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/compress"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 )
 
@@ -15,6 +16,8 @@ func main() {
 
 	app := fiber.New()
 	app.Use(cors.New())
+	//app.Use(compress.New()) // default
+	app.Use(compress.New(compress.Config{ Level: compress.LevelBestSpeed, })) // en hizli yanit ver
 
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.SendString("Hello, World 👋!")
