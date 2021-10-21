@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"mygfibertest/src/model"
+	"mygfiber/src/model"
 
 	_ "github.com/denisenkom/go-mssqldb"
 	"github.com/gofiber/fiber/v2"

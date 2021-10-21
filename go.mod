@@ -1,4 +1,4 @@
-module mygfibertest
+module mygfiber
 
 go 1.16
 
