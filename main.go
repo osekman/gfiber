@@ -118,10 +118,7 @@ func getUsers(c *fiber.Ctx) error {
 	re := model.GetData("mysql", "SELECT * FROM customers limit 5", somevars)
 
 	return c.JSON(re)
-
 }
-
-
 
 // Handler
 func createUser(c *fiber.Ctx) error {
