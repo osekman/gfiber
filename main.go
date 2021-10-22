@@ -14,16 +14,31 @@ import (
 
 func main() {
 
+	// app := fiber.New(fiber.Config{
+    //     Views: html.New("./src/view", ".html"),
+       
+    // })
 	app := fiber.New()
 	app.Use(cors.New())
 	//app.Use(compress.New()) // default
 	app.Use(compress.New(compress.Config{ Level: compress.LevelBestSpeed, })) // en hizli yanit ver
 
-	app.Get("/", func(c *fiber.Ctx) error {
-		return c.SendString("Hello, World 👋!")
-	})
 
-	app.Get("/sql", func(c *fiber.Ctx) error {
+
+	// app.Get("/", func(c *fiber.Ctx) error {
+	// 	return c.Render("index", fiber.Map{
+	// 	   "Title": "Hello, World!",
+	// 	})
+	//   })
+	api := app.Group("/api") // /api
+	v1 := api.Group("/v1", func(c *fiber.Ctx) error { // middleware for /api/v1
+        c.Set("Version", "v1")
+        return c.Next()
+    })
+
+	app.Static("/","./src/view")
+
+	v1.Get("/sql", func(c *fiber.Ctx) error {
 
 		// var db *sql.DB
 
@@ -65,11 +80,11 @@ func main() {
 
 	// Routes
 	//app.Get("/test", test.getArr())
-	app.Get("/j", getUsers).Post("/j", createUser).Put("/j", updateUser)
+	v1.Get("/j", getUsers).Post("/j", createUser).Put("/j", updateUser)
 	//.Delete("j/:id", json)
 
 	// GET /flights/LAX-SFO
-	app.Get("/flights/:from/:to", func(c *fiber.Ctx) error {
+	v1.Get("/flights/:from/:to", func(c *fiber.Ctx) error {
 		msg := fmt.Sprintf("💸 From: %s, To: %s", c.Params("from"), c.Params("to"))
 		return c.SendString(msg) // => 💸 From: LAX, To: SFO
 	})
@@ -111,15 +126,25 @@ func getUsers(c *fiber.Ctx) error {
 // Handler
 func createUser(c *fiber.Ctx) error {
 
+	type ReqBody struct{
+		Token string `json:"token" xml:"token" form:"token"`
+		Username string `json:"username" xml:"username" form:"username"`
+		OrderCode string `json:"order_code" xml:"order_code" form:"order_code"`
+	}
+
+	p := new(ReqBody)
+
+	if  err:= c.BodyParser(p); err != nil {
+		return err
+	}
+
+	fmt.Println( "token  >> " + p.Token )
+	fmt.Println( "username >> "+ p.Username )
+	fmt.Println( "ordercode >> "+ p.OrderCode )
+
 	type SomeStruct struct {
 		Name string `json:"name" xml:"name" form:"name"`
 		Age  uint8  `json:"age" xml:"age" form:"age"`
-	}
-
-	p := new(SomeStruct)
-
-	if err := c.BodyParser(p); err != nil {
-		return err
 	}
 
 	var data = []SomeStruct{
@@ -130,7 +155,7 @@ func createUser(c *fiber.Ctx) error {
 	data = append(data, SomeStruct{Name: "Grame2", Age: 21})
 	data = append(data, SomeStruct{Name: "Grame3", Age: 22})
 
-	data = append(data, SomeStruct{Name: p.Name, Age: p.Age})
+	//data = append(data, SomeStruct{Name: p.Name, Age: p.Age})
 
 	return c.JSON(data)
 }
@@ -150,10 +175,7 @@ func updateUser(c *fiber.Ctx) error {
 		return err
 	}
 
-	var data = []SomeStruct{
-		SomeStruct{Id: 0, Name: "Grame1", Age: 20},
-	}
-
+	var data = []SomeStruct{}
 	// dizilerde ekleme yaparken ekli halini diziye return etmek lazım.
 	data = append(data, SomeStruct{Id: 1, Name: "Grame2", Age: 21})
 	data = append(data, SomeStruct{Id: 2, Name: "Grame3", Age: 22})
