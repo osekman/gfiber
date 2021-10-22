@@ -1,1 +1,1 @@
-const appName = "ERPIST-GFB";
+const appName = "ERP-IST-GFB";
