@@ -5,9 +5,11 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"os"
 	"sync"
 
 	_ "github.com/denisenkom/go-mssqldb"
+	env "github.com/joho/godotenv"
 )
 
 var db *sql.DB
@@ -29,27 +31,41 @@ var instance *DriversDB
 
 func Connect() *DriversDB {
 
-	hostname := "localhost"
-	port := 3306
-	username := "root"
-	password := ""
-	database := "test"
+	err := env.Load(".env")
+	if err != nil {
+		fmt.Printf("Some error occured. Err: %s", err)
+	}
 
-	connString := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8", username, password, hostname, port, database)
+	// hostname := "localhost"
+	// port := 3306
+	// username := "root"
+	// password := ""
+	// database := "test"
+
+	db_type 	:= os.Getenv("db_type")
+	hostname 	:= os.Getenv("db_host")
+	port 		:= os.Getenv("db_port")
+	username 	:= os.Getenv("db_username")
+	password 	:= os.Getenv("db_password")
+	database 	:= os.Getenv("db_name")
+
+	connString := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8", username, password, hostname, port, database)
 	mdb, err := sql.Open("mysql", connString)
+
+	fmt.Println("Failed to connect", db_type)
 
 	if err != nil {
 		fmt.Println("Failed to connect", err)
 	}
 
 	hostname = "176.236.208.126"
-	port = 1433
+	port = "1433"
 	username = "sa"
 	password = "@Z7N!@Xbm8!"
 	database = "modaselvim"
 
 	// Build connection string
-	connString = fmt.Sprintf("server=%s;user id=%s;password=%s;port=%d;database=%s;", hostname, username, password, port, database)
+	connString = fmt.Sprintf("server=%s;user id=%s;password=%s;port=%s;database=%s;", hostname, username, password, port, database)
 	mdb2, err := sql.Open("sqlserver", connString)
 	if err != nil {
 		log.Fatal(err.Error())

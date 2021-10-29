@@ -5,24 +5,26 @@ import (
 	"database/sql"
 	"fmt"
 	"mygfiber/src/model"
+	"os"
 
 	_ "github.com/denisenkom/go-mssqldb"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/compress"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	env "github.com/joho/godotenv"
 )
 
 func main() {
 
 	// app := fiber.New(fiber.Config{
     //     Views: html.New("./src/view", ".html"),
-       
     // })
+
+
 	app := fiber.New()
 	app.Use(cors.New())
 	//app.Use(compress.New()) // default
 	app.Use(compress.New(compress.Config{ Level: compress.LevelBestSpeed, })) // en hizli yanit ver
-
 
 
 	// app.Get("/", func(c *fiber.Ctx) error {
@@ -30,13 +32,31 @@ func main() {
 	// 	   "Title": "Hello, World!",
 	// 	})
 	//   })
+
+
 	api := app.Group("/api") // /api
 	v1 := api.Group("/v1", func(c *fiber.Ctx) error { // middleware for /api/v1
         c.Set("Version", "v1")
         return c.Next()
     })
 
-	app.Static("/","./src/view")
+	app.Static("/","./statics")
+
+	// APP rooting
+	app.Get("/test", func(c *fiber.Ctx) error {
+		err := env.Load(".env")
+		if err != nil {
+			fmt.Printf("Some error occured. Err: %s", err)
+		}
+
+		val := os.Getenv("stack")
+		fmt.Println(val)
+
+		val = os.Getenv("port")
+		fmt.Println(val)
+
+		return c.SendString(val)
+	})
 
 	v1.Get("/sql", func(c *fiber.Ctx) error {
 
@@ -79,7 +99,6 @@ func main() {
 	})
 
 	// Routes
-	//app.Get("/test", test.getArr())
 	v1.Get("/j", getUsers).Post("/j", createUser).Put("/j", updateUser)
 	//.Delete("j/:id", json)
 
@@ -114,8 +133,8 @@ func getUsers(c *fiber.Ctx) error {
 	somevars := []interface{}{888888, "ooooooosssssmmmmm"}
 
 	//re := model.SetData("mysql", "insert into customers (CustomerId,CustomerUsername) values (?,?)", somevars)
-	//re := model.GetData("sqlserver", "SELECT TOP 5 id, tsnumber, kargo FROM ztKargo", somevars)
-	re := model.GetData("mysql", "SELECT * FROM customers limit 5", somevars)
+	re := model.GetData("sqlserver", "SELECT TOP 5 id, tsnumber, kargo FROM ztKargo", somevars)
+	//re := model.GetData("mysql", "SELECT * FROM customers limit 5", somevars)
 
 	return c.JSON(re)
 }
