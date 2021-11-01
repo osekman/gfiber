@@ -16,6 +16,11 @@ import (
 )
 
 
+type SomeStruct struct {
+	Name string
+	Age  int32
+}
+
 func main() {
 
 	// app := fiber.New(fiber.Config{
@@ -145,13 +150,10 @@ func getUsers(c *fiber.Ctx) error {
 	// fmt.Println(model.GetData("mysql", "SELECT * FROM customers limit 5", []string{}))
 	// fmt.Println(model.GetData("sqlserver", "SELECT TOP 5 id, tsnumber, kargo FROM ztKargo", []string{}))
 
-	type SomeStruct struct {
-		Name string
-		Age  uint8
-	}
+
 
 	var mdata = []SomeStruct{
-		SomeStruct{Name: "Grame1", Age: 20},
+		{Name: "Grame1", Age: 20,},
 	}
 
 	// dizilerde ekleme yaparken ekli halini diziye return etmek lazım.
@@ -192,7 +194,7 @@ func createUser(c *fiber.Ctx) error {
 	}
 
 	var data = []SomeStruct{
-		SomeStruct{Name: "Grame1", Age: 20},
+		{Name: "Grame1", Age: 20},
 	}
 
 	// dizilerde ekleme yaparken ekli halini diziye return etmek lazım.
