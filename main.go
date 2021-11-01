@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"mygfiber/src/model"
 	"os"
+	"time"
 
 	_ "github.com/denisenkom/go-mssqldb"
 	"github.com/gofiber/fiber/v2"
@@ -13,6 +14,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	env "github.com/joho/godotenv"
 )
+
 
 func main() {
 
@@ -22,7 +24,33 @@ func main() {
 
 
 	app := fiber.New()
+
 	app.Use(cors.New())
+
+	// Default middleware config
+	app.Use(func(c *fiber.Ctx) error {
+		
+		dt := time.Now()
+		//Format YYYY-MM-DD
+		log_path := "./"+dt.Format("2006-02-01")+".log"
+
+		file, err := os.OpenFile(log_path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
+		if err != nil {
+			fmt.Printf("error opening file: %v", err)
+		}
+
+		newLine := "[ " + c.IP() +" ] " +c.Method()+ " - "+c.OriginalURL()
+		_, err = fmt.Fprintln(file, newLine)
+
+		if err != nil {
+			fmt.Println(err)
+			defer file.Close()
+		}
+
+		// Go to next middleware:
+		return c.Next()
+	})
+
 	//app.Use(compress.New()) // default
 	app.Use(compress.New(compress.Config{ Level: compress.LevelBestSpeed, })) // en hizli yanit ver
 
@@ -31,7 +59,7 @@ func main() {
 	// 	return c.Render("index", fiber.Map{
 	// 	   "Title": "Hello, World!",
 	// 	})
-	//   })
+	// })
 
 
 	api := app.Group("/api") // /api
@@ -245,6 +273,34 @@ func ReadEmployees(db *sql.DB) (int, error) {
 	}
 
 	return count, nil
+}
+
+func getFile() *os.File {
+
+	dt := time.Now()
+	//Format YYYY-MM-DD
+	log_path := "./"+dt.Format("2006-02-01")+".log"
+
+	f, err := os.OpenFile(log_path, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	if err != nil {
+		fmt.Printf("error opening file: %v", err)
+	}
+
+	f.Close()
+
+	return f
+
+}
+
+// fileExists checks if a file exists and is not a directory before we
+// try using it to prevent further errors.
+func fileExists(filename string) bool {
+    info, err := os.Stat(filename)
+    if os.IsNotExist(err) {
+        return false
+    }
+	
+    return !info.IsDir()
 }
 
 // func GetData(sql string, params []string) ([]string, error){
