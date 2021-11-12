@@ -9,6 +9,7 @@ import (
 	"time"
 
 	_ "github.com/denisenkom/go-mssqldb"
+	"github.com/gen2brain/beeep"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/compress"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -76,6 +77,17 @@ func main() {
 	app.Static("/","./statics")
 
 	// APP rooting
+	app.Get("/map", func(c *fiber.Ctx) error {
+		err := env.Load(".env")
+		if err != nil {
+			fmt.Printf("Some error occured. Err: %s", err)
+		}
+
+		return c.JSON(fiber.Map{"aa":12})
+	})
+
+	
+	// APP rooting
 	app.Get("/test", func(c *fiber.Ctx) error {
 		err := env.Load(".env")
 		if err != nil {
@@ -87,6 +99,11 @@ func main() {
 
 		val = os.Getenv("port")
 		fmt.Println(val)
+
+		err = beeep.Notify("Title", "Message body", "assets/information.png")
+		if err != nil {
+			panic(err)
+		}
 
 		return c.SendString(val)
 	})

@@ -9,6 +9,7 @@ import (
 	"sync"
 
 	_ "github.com/denisenkom/go-mssqldb"
+	"github.com/gofiber/fiber/v2"
 	env "github.com/joho/godotenv"
 )
 
@@ -16,10 +17,14 @@ var db *sql.DB
 var err error
 var once sync.Once
 
+// Map is a shortcut for map[string]interface{}, useful for JSON returns
+// type Map map[string]interface{}
+
 type Response struct {
 	Status  int64  
 	Message string
-	Data    []map[string]interface{}
+	//Data    []map[string]interface{}
+	Data    []fiber.Map
 }
 
 type DriversDB struct {
@@ -86,7 +91,7 @@ func init() {
 }
 
 func GetData(conn string, sqlString string, parameters []interface{}) Response {
-	resp := Response{Status: 0, Message: "", Data: []map[string]interface{}{} }
+	resp := Response{Status: 0, Message: "", Data: []fiber.Map{} }
 
 	switch conn {
 	case "mysql":
@@ -113,7 +118,7 @@ func GetData(conn string, sqlString string, parameters []interface{}) Response {
 		return resp
 	}
 	count := len(columns)
-	tableData := make([]map[string]interface{}, 0)
+	tableData := make([]fiber.Map, 0)
 	values := make([]interface{}, count)
 	valuePtrs := make([]interface{}, count)
 	for rows.Next() {
@@ -121,7 +126,7 @@ func GetData(conn string, sqlString string, parameters []interface{}) Response {
 			valuePtrs[i] = &values[i]
 		}
 		rows.Scan(valuePtrs...)
-		entry := make(map[string]interface{})
+		entry := make(fiber.Map)
 		for i, col := range columns {
 			var v interface{}
 			val := values[i]
@@ -147,7 +152,7 @@ func GetData(conn string, sqlString string, parameters []interface{}) Response {
 
 func SetData(conn string, sqlString string, parameters []interface{}) Response {
 
-	resp := Response{Status: 0, Message: "", Data: []map[string]interface{}{} }
+	resp := Response{Status: 0, Message: "", Data: []fiber.Map{} }
 
 	switch conn {
 	case "mysql":
