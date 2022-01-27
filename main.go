@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"mygfiber/src/controller"
 	"mygfiber/src/model"
 	"os"
 	"time"
@@ -78,6 +79,11 @@ func main() {
 
 	// APP rooting
 	app.Get("/map", func(c *fiber.Ctx) error {
+
+		//var data map[interface{}]interface{}
+
+		println(controller.Greet2()) 
+
 		err := env.Load(".env")
 		if err != nil {
 			fmt.Printf("Some error occured. Err: %s", err)
@@ -86,7 +92,7 @@ func main() {
 		return c.JSON(fiber.Map{"aa":12})
 	})
 
-	
+
 	// APP rooting
 	app.Get("/test", func(c *fiber.Ctx) error {
 		err := env.Load(".env")
