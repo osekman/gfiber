@@ -63,11 +63,12 @@ func Connect() *DriversDB {
 		fmt.Println("Failed to connect", err)
 	}
 
-	hostname = "176.236.208.126"
-	port = "1433"
-	username = "sa"
-	password = "@Z7N!@Xbm8!"
-	database = "modaselvim"
+	// ms-sql db conn
+	hostname = ""
+	port = ""
+	username = ""
+	password = ""
+	database = ""
 
 	// Build connection string
 	connString = fmt.Sprintf("server=%s;user id=%s;password=%s;port=%s;database=%s;", hostname, username, password, port, database)
